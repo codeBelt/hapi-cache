@@ -15,45 +15,16 @@ server.route({
 });
 
 
-
-
-
-// const add = (a, b, next) => {
-//     console.log(`add`);
-//
-//     return next(null, Number(a) + Number(b));
-// };
-// server.method('sum', add, {
-//     cache: {
-//         expiresIn: 30 * 1000,
-//         generateTimeout: 100
-//     }
-// });
-// server.route({
-//     path: '/add/{a}/{b}',
-//     method: 'GET',
-//     handler: function (request, reply) {
-//         server.methods.sum(request.params.a, request.params.b, (err, result) => {
-//
-//             if (err) {
-//                 return reply(err);
-//             }
-//             reply(result);
-//         });
-//     }
-// });
-
-
-
-
-
-
 const fetchData = async (endpoint, next) => {
-
     console.log(`fetchData`);
     const response = await fetch(endpoint);
-    let data = await response.json();
-    data = data.results[0];
+    let data = null;
+
+    if (response.status === 200) {
+        const json = await response.json();
+
+        data = json.results[0];
+    }
 
     return next(null, data);
 };
@@ -70,49 +41,16 @@ server.route({
         const selectEverythingBeforeRegex = new RegExp('(.*?)/recipes-ideas/cms');
         const endpoint = request.url.path.replace(selectEverythingBeforeRegex, 'https://randomuser.me/api');
 
-        server.methods.fetchData(endpoint, async (error, cachedResponse) => {
-            let response = cachedResponse;
-            let data = null;
-
-            if (!response) {
-                response = await fetch(endpoint);
-                response = await response.json();
-                response = data.results[0];
-
-                console.log(`hey`);
-            }
-
+        server.methods.fetchData(endpoint, async (error, cachedData) => {
             if (error) {
                 return reply(error);
             }
 
-            reply(response);
+            reply(cachedData);
         });
     }
 });
 
-// server.route({
-//     method: 'GET',
-//     path: '/recipes-ideas/cms/{path*}',
-//     handler: async (request, reply) => {
-//         const selectEverythingBeforeRegex = new RegExp('(.*?)/recipes-ideas/cms');
-//         const endpoint = request.url.path.replace(selectEverythingBeforeRegex, 'https://randomuser.me/api');
-//
-//         console.log(`endpoint`, endpoint);
-//         console.log(`endpoint`, 'https://randomuser.me/api/?inc=gender,name,nat');
-//
-//         const response = await fetch(endpoint);
-//         let data = null;
-//
-//         if (response.status === 200) {
-//             const json = await response.json();
-//
-//             data = json.results[0];
-//         }
-//
-//         reply(data);
-//     }
-// });
 
 server.start((err) => {
     if (err) {
