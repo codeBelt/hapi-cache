@@ -4,5 +4,13 @@
   "main": "server.js",
   "repository": "https://github.com/codeBelt/hapi-cache.git",
   "author": "rsavian <rsavian@nerdery.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "fetch-everywhere": "^1.0.5",
+    "hapi": "^16.5.2",
+    "nodemon": "^1.11.0"
+  },
+  "scripts": {
+    "start": "BABEL_ENV=client NODE_ENV=development nodemon ./server.js"
+  }
 }
