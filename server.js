@@ -30,7 +30,7 @@ const fetchData = async (endpoint, next) => {
 };
 server.method('fetchData', fetchData, {
     cache: {
-        expiresIn: 30 * 1000,
+        expiresIn: 60 * 1000,
         generateTimeout: 1000
     }
 });
@@ -47,6 +47,18 @@ server.route({
             }
 
             reply(cachedData);
+        });
+    }
+});
+server.route({
+    path: '/recipes-ideas/cms/drop/{path*}',
+    method: 'GET',
+    handler: (request, reply) =>  {
+        const selectEverythingBeforeRegex = new RegExp('(.*?)/recipes-ideas/cms/drop');
+        const endpoint = request.url.path.replace(selectEverythingBeforeRegex, 'https://randomuser.me/api');
+
+        server.methods.fetchData.cache.drop(endpoint, () => {
+            reply(`dropped: ${endpoint}`);
         });
     }
 });
